@@ -3,3 +3,12 @@
 __pycache__/
 *.[mM][dD]
 !/README.md
+.env.*
+*.key
+*.pem
+*.py[cod]
+/.pytest_cache/
+/.mypy_cache/
+/.ruff_cache/
+/data/private/
+/*results_*.jsonl
