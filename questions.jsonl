@@ -1,4 +1,4 @@
 {"id": 1, "prompt": "17 × 19 等于多少？只输出数字。", "expected": "323"}
 {"id": 2, "prompt": "12 × 12 等于多少？只输出数字。", "expected": "144"}
 {"id": 3, "prompt": "中国的首都是哪里？只输出城市名。", "expected": "北京"}
-
+{"id":4,"prompt":"Explain what HTTP 429 means and suggest one safe next step.","expected":"HTTP 429 means too many requests or a rate limit was reached. The client should wait before retrying, for example by following Retry-After or using backoff."}
