@@ -122,48 +122,53 @@ Return only a JSON object with:
         "reason": judgment["reason"]
     }
 
+
 def grade_results(filename):
+    output_filename = "graded_" + filename
     total = 0
     passed = 0
-    api_key = None
 
     with open(filename, "r", encoding="utf-8") as f:
-        for line in f:
-            if not line.strip():
-                continue
-
-            record = json.loads(line)
-
-            if record.get("status") != "success":
-                print(f"题目 {record['id']}：模型请求失败，单独记录")
-                continue
-
-            if record["id"] in (1, 2):
-                result = grade_numeric(
-                    record["answer"],
-                    record["expected"]
-                )
-
-            elif record["id"] == 4:
-                if api_key is None:
-                    api_key = getpass("Judge API key: ")
-
-                try:
-                    result = grade_with_llm(record, api_key)
-                except (ValueError, KeyError, OSError) as e:
-                    print(f"题目 4：评分器异常：{e}")
+        with open(output_filename, "w", encoding="utf-8") as output:
+            for line in f:
+                if not line.strip():
                     continue
 
-            else:
-                continue
+                record = json.loads(line)
 
-            total += 1
-            passed += int(result["pass"])
+                # 暂时只评分第一周的两道整数题
+                if record["id"] in (1, 2):
+                    if record["status"] == "success":
+                        grading = grade_numeric(
+                            record["answer"],
+                            record["expected"]
+                        )
+                    else:
+                        grading = {
+                            "content_pass": None,
+                            "format_pass": None,
+                            "pass": False,
+                            "error_type": "api_failure"
+                        }
 
-            print(f"题目 {record['id']}：{result}")
+                    total += 1
+                    passed += int(grading["pass"])
+                else:
+                    grading = None
+
+                record["grading"] = grading
+
+                output.write(
+                    json.dumps(record, ensure_ascii=False) + "\n"
+                )
+
+                print(f"题目 {record['id']}：{grading}")
+
+    print(f"\n评分文件：{output_filename}")
 
     if total:
-        print(f"\n已评分题目通过率：{passed}/{total} = {passed/total:.2%}")
+        print(f"通过率：{passed}/{total} = {passed / total:.2%}")
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
