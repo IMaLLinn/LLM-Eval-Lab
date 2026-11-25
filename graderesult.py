@@ -10,23 +10,18 @@ GRADER_VERSION = "v0.1"
 JUDGE_MODEL = "deepseek-v4-pro"
 
 def grade_numeric(answer, expected):
-    if not isinstance(answer, str):
-        return {
-            "content_pass": False,
-            "format_pass": False,
-            "pass": False
-        }
-
     text = answer.strip()
-    numbers = re.findall(r"\d+", text)
+
+    numbers = re.findall(r"-?\d+(?:\.\d+)?", text)
 
     content_pass = (
         len(numbers) == 1
-        and numbers[0] == str(expected)
+        and float(numbers[0]) == float(expected)
     )
 
     format_pass = (
-        re.fullmatch(r"\d+", text) is not None
+        re.fullmatch(r"-?\d+(?:\.\d+)?", text)
+        is not None
     )
 
     return {
@@ -295,7 +290,11 @@ def grade_results(filename, split="dev", review_code=False):
 
                 elif record["grader_type"] == "unit_test":
                     grading = grade_code(record, review_code)
-
+                elif record["grader_type"] == "numeric":
+                    grading = grade_numeric(
+                        record["answer"],
+                        record["expected"]
+                    )
                 else:
                     grading = {"pass": None}
 
