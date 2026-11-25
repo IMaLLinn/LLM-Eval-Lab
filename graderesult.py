@@ -6,7 +6,8 @@ import tempfile
 from urllib.request import Request, urlopen
 import argparse
 from pathlib import Path
-from collections import Counter
+GRADER_VERSION = "v0.1"
+JUDGE_MODEL = "deepseek-v4-pro"
 
 def grade_numeric(answer, expected):
     if not isinstance(answer, str):
@@ -97,7 +98,7 @@ Return only a JSON object with:
     }
 
     payload = {
-        "model": "deepseek-v4-pro",
+        "model": JUDGE_MODEL,
         "messages": [
             {"role": "system", "content": system_prompt},
             {
@@ -303,8 +304,11 @@ def grade_results(filename, split="dev", review_code=False):
 
                     if grading["pass"]:
                         passed += 1
-
+                record["grader_version"] = GRADER_VERSION
                 record["grading"] = grading
+
+                if record["grader_type"] == "judge_rubric":
+                    record["judge_model"] = JUDGE_MODEL                
 
                 output.write(
                     json.dumps(record, ensure_ascii=False) + "\n"

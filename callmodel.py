@@ -44,7 +44,7 @@ run_id = uuid.uuid4().hex[:8]
 
 with open("apikey.txt", "r", encoding="utf-8") as f:
     api_key = f.read().strip()
-
+RUBRIC_VERSION = "v0.1"
 PRICES = {
     "deepseek-flash": {
         "offpeak": (0.02, 1.0, 4.0),
@@ -163,6 +163,7 @@ with open("questions.jsonl", "r", encoding="utf-8") as file:
                     "price_period": price_period,
                     "currency": "CNY",
                     "trial": trial,
+                    "rubric_version": RUBRIC_VERSION,
             }
             output.write(json.dumps(record, ensure_ascii=False) + "\n")
             print(question["id"], answer, status, error if error is not None else "没错误")
