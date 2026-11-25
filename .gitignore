@@ -4,6 +4,7 @@ __pycache__/
 *.[mM][dD]
 !/README.md
 .env.*
+/apikey.txt
 *.key
 *.pem
 *.py[cod]
