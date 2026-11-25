@@ -1,5 +1,6 @@
 import json
 import random
+from pathlib import Path
 from urllib.request import urlopen
 
 BASE_URL = (
@@ -9,7 +10,8 @@ BASE_URL = (
 
 random.seed(42)
 
-with open("questions.jsonl", "a", encoding="utf-8") as f:
+questions_file = Path(__file__).resolve().parent.parent / "data" / "questions.jsonl"
+with open(questions_file, "a", encoding="utf-8") as f:
     for source, split, count in [
         ("train", "dev", 10),
         ("test", "test", 20)

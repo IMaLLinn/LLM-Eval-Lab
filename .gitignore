@@ -13,3 +13,4 @@ __pycache__/
 /.ruff_cache/
 /data/private/
 /*results_*.jsonl
+/runs/
