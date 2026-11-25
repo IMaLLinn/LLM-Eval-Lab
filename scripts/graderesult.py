@@ -1,28 +1,31 @@
-import re
 import json
+import re
 import sys
 import subprocess
 import tempfile
 from urllib.request import Request, urlopen
 import argparse
 from pathlib import Path
+from decimal import Decimal
 GRADER_VERSION = "v0.2"
+NUMERIC_VERSION = "v0.3"
 JUDGE_MODEL = "deepseek-v4-pro"
+NUMBER = r"[+-]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?"
+
 
 def grade_numeric(answer, expected):
-    text = answer.strip()
-
-    numbers = re.findall(r"-?\d+(?:\.\d+)?", text)
-
-    content_pass = (
-        len(numbers) == 1
-        and float(numbers[0]) == float(expected)
+    text = answer.strip() if isinstance(answer, str) else ""
+    final = re.search(
+        rf"^\s*(?:\*\*)?(?:final (?:answer|number)|最终答案)\s*[:：](?:\*\*)?\s*({NUMBER})\s*\Z",
+        text,
+        re.IGNORECASE | re.MULTILINE,
     )
 
-    format_pass = (
-        re.fullmatch(r"-?\d+(?:\.\d+)?", text)
-        is not None
+    numbers = [final[1]] if final else re.findall(NUMBER, text)
+    content_pass = len(numbers) == 1 and (
+        Decimal(numbers[0].replace(",", "")) == Decimal(str(expected).replace(",", ""))
     )
+    format_pass = re.fullmatch(r"-?\d+(?:\.\d+)?", text) is not None
 
     return {
         "content_pass": content_pass,
@@ -321,7 +324,8 @@ def grade_results(filename, split="dev", review_code=False):
 
                     if grading["pass"]:
                         passed += 1
-                record["grader_version"] = GRADER_VERSION
+                version = NUMERIC_VERSION if record["grader_type"] == "numeric" else GRADER_VERSION
+                record["grader_version"] = version
                 record["grading"] = grading
 
                 if record["grader_type"] == "judge_rubric":

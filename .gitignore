@@ -3,6 +3,7 @@
 __pycache__/
 *.[mM][dD]
 !/README.md
+!/CALIBRATION.md
 .env.*
 /apikey.txt
 *.key
